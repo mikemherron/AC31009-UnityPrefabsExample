@@ -1,28 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class TurretController : MonoBehaviour
 {
     public GameObject bulletPrefab;
 
-    public GameObject fireTarget;
-
     public float fireDelay = 0f;
 
-    public AudioSource hitSound;
-
     private float timeToNextFire = 0f;
-    
-    public SpriteRenderer spriteRenderer;
 
     public int health = 3;
 
     public float fireSpeed = 0.5f;
 
+    private GameObject fireTarget;
+
     void Start()
     {
         timeToNextFire = fireDelay * Random.value;
+
+        // Note this has changed from the last demo - we now look up the
+        // player by tag rather than requiring the reference to be provided
+        // in the editor. This makes it easier to reuse the turret prefab at the
+        // expense of a static reference to the player.
+        fireTarget = GameObject.FindGameObjectWithTag("Player");
     }
 
     // Update is called once per frame
@@ -51,7 +51,10 @@ public class TurretController : MonoBehaviour
             BulletController bullet = collision.gameObject.GetComponent<BulletController>();
             if (bullet.firedBy.tag == "Player") {
                 Destroy(collision.gameObject);
-                Destroy(gameObject);
+                health--;
+                if (health <= 0) {
+                    Destroy(gameObject);
+                }
             }
         }
     }
