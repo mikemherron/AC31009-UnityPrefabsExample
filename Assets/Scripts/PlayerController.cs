@@ -1,25 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
-
-// Using own health:
-[System.Serializable]
-public class PlayerHealthUpdatedEvent : UnityEvent<int> { }
 
 public class PlayerController : MonoBehaviour
 {
-    // Using own health:
-    public PlayerHealthUpdatedEvent onPlayerHealthUpdated;
-
-    // Using health controller:
-    //public HealthController healthController;
+    // Rather than use our own health properties, we
+    // now have a component, HealthController, that 
+    // manages our health. We can use this component
+    // on any game object that needs health!
+    private HealthController healthController;
 
     public GameObject bulletPrefab;
-    
-    // Using own health
-    public int health = 10;
-    public int maxHealth = 10;
 
     public float moveSpeed = 0f;
     public Rigidbody2D rigidBody;
@@ -29,11 +18,11 @@ public class PlayerController : MonoBehaviour
     
     void Start()
     {
-        // Using own health
-        health = maxHealth;
-        if(onPlayerHealthUpdated == null) {
-             onPlayerHealthUpdated = new PlayerHealthUpdatedEvent();
-        }
+        // Get the HealthController component from this game object
+        // programmatically rather than needing it to be set in the
+        // inspector. For components that always go together, this
+        // can be preferred to linking them in the inspector.
+        healthController = GetComponent<HealthController>();
     }
 
     void Update()
@@ -66,19 +55,13 @@ public class PlayerController : MonoBehaviour
             BulletController controller = collision.gameObject.GetComponent<BulletController>();
             if (controller.firedBy.tag == "Turret") {
                 Destroy(collision.gameObject);
-                // Using own health:
-                health--;
-                onPlayerHealthUpdated.Invoke(health);
-                 if(health > 0) {
+                // We can now use the HealthController component
+                // to manage our health rather than having to
+                // manage it ourselves.
+                healthController.TakeDamage();
+                 if(healthController.health > 0) {
                     hitSound.Play();
-                }
-
-                // Using the health controller instead:
-                // healthController.TakeDamage();
-                // if (healthController.health > 0) {
-                //     hitSound.Play();
-                // }
-                
+                 }
             }
         }
     }

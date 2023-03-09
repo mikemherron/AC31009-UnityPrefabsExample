@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class TurretController : MonoBehaviour
 {
+    // Turret can also use te new HealthController component
+    private HealthController healthController;
     public GameObject bulletPrefab;
 
     public float fireDelay = 0f;
 
     private float timeToNextFire = 0f;
-
-    public int health = 3;
 
     public float fireSpeed = 0.5f;
 
@@ -17,7 +17,7 @@ public class TurretController : MonoBehaviour
     void Start()
     {
         timeToNextFire = fireDelay * Random.value;
-
+        healthController = GetComponent<HealthController>();
         // Note this has changed from the last demo - we now look up the
         // player by tag rather than requiring the reference to be provided
         // in the editor. This makes it easier to reuse the turret prefab at the
@@ -46,14 +46,13 @@ public class TurretController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Turret hit by bullet");
         if (collision.gameObject.tag == "Bullet") {
             BulletController bullet = collision.gameObject.GetComponent<BulletController>();
             if (bullet.firedBy.tag == "Player") {
                 Destroy(collision.gameObject);
-                health--;
-                if (health <= 0) {
-                    Destroy(gameObject);
+                healthController.TakeDamage();
+                if (healthController.health <= 0) {
+                    Destroy(gameObject) ;
                 }
             }
         }
