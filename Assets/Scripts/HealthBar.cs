@@ -3,12 +3,7 @@ using UnityEngine.UI;
 
 public class HealthBar : MonoBehaviour
 {
-    // Using player:
     public PlayerController playerController;
-
-    // Using health controller:
-    // public HealthController health;
-
     public Slider slider;
     
     void Start()
